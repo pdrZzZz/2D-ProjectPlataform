@@ -15,26 +15,26 @@ public class MovePlayer : MonoBehaviour
         _rb = GetComponent<Rigidbody2D>();
         _animator = GetComponent<Animator>();
     }
-   
+
     private void Update()
     {
-        _rb.linearVelocity = new Vector2(_move.x * _speed, _rb.linearVelocity.y);
+        _rb.velocity = new Vector2(_move.x * _speed, _rb.velocity.y);
 
-        // Atualiza a anima��o de movimento
+        // Atualiza a animação de movimento
         _animator.SetFloat("Speed", Mathf.Abs(_move.x));
 
-        // Ativa a anima��o de queda quando estiver caindo
-        if (!_checkGround && _rb.linearVelocity.y < 0)
+        // Ativa a animação de queda quando estiver caindo
+        if (!_checkGround && _rb.velocity.y < 0)
         {
             _animator.SetBool("IsFalling", true);
         }
 
-
-        // Ajusta a dire��o do sprite
+        // Ajusta a direção do sprite
         if (_move.x > 0)
             transform.localScale = new Vector3(1, 1, 1);
         else if (_move.x < 0)
             transform.localScale = new Vector3(-1, 1, 1);
+
     }
 
     public void SetMove(InputAction.CallbackContext value)
@@ -46,12 +46,12 @@ public class MovePlayer : MonoBehaviour
     {
         if (_checkGround && value.performed)
         {
-            _rb.linearVelocity = new Vector2(_rb.linearVelocity.x, 0);
+            _rb.velocity = new Vector2(_rb.velocity.x, 0); // Zera apenas a velocidade vertical antes de pular
             _rb.AddForce(Vector2.up * _jumpF, ForceMode2D.Impulse);
 
-            // Ativa a anima��o de pulo
+            // Ativa a animação de pulo
             _animator.SetBool("IsJumping", true);
-            _animator.SetBool("IsFalling", false); // Garante que n�o entre em queda imediatamente
+            _animator.SetBool("IsFalling", false); // Garante que não entre em queda imediatamente
         }
     }
 
