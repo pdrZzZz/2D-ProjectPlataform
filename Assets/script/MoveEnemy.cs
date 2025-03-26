@@ -5,8 +5,9 @@ public class MoveEnemy : MonoBehaviour
 {
     [SerializeField] Transform _player;
     [SerializeField] float speed = 3f;
+    [SerializeField] float stopDistance = 0.5f; // Distância mínima antes de parar
     [SerializeField] Rigidbody2D rb;
-    [SerializeField] Animator anim; 
+    [SerializeField] Animator anim;
 
     void Start()
     {
@@ -18,21 +19,31 @@ public class MoveEnemy : MonoBehaviour
     {
         if (_player != null)
         {
-            // Calcula a dire��o no eixo X
-            Vector2 direction = new Vector2(_player.position.x - transform.position.x, 0).normalized;
+            // Calcula a diferença de posição no eixo X
+            float distanceX = _player.position.x - transform.position.x;
 
-            // Move o inimigo
-            rb.linearVelocity = new Vector2(direction.x * speed, rb.linearVelocity.y);
+            // Verifica se a distância é maior que o valor de parada
+            if (Mathf.Abs(distanceX) > stopDistance)
+            {
+                // Normaliza a direção para evitar variações bruscas
+                Vector2 direction = new Vector2(Mathf.Sign(distanceX), 0);
 
-            // Ativar anima��o de movimento
-            bool isMoving = Mathf.Abs(rb.linearVelocity.x) > 0.1f;
-            anim.SetBool("isMoving", isMoving);
+                // Move o inimigo
+                rb.velocity = new Vector2(direction.x * speed, rb.velocity.y);
 
-            // Flip do sprite para virar na dire��o correta
-            if (rb.linearVelocity.x > 0)
-                transform.localScale = new Vector3(-1, 1, 1);
-            else if (rb.linearVelocity.x < 0)
-                transform.localScale = new Vector3(1, 1, 1);
+                // Ativar animação de movimento
+                anim.SetBool("isMoving", true);
+
+                // Flip do sprite para virar na direção correta
+                transform.localScale = new Vector3(direction.x > 0 ? -1 : 1, 1, 1);
+
+            }
+            else
+            {
+                // Para a movimentação caso o player esteja muito próximo
+                rb.velocity = new Vector2(0, rb.velocity.y);
+                anim.SetBool("isMoving", false);
+            }
         }
         else
         {
